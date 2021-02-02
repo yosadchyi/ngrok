@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"ngrok/conn"
@@ -60,7 +61,7 @@ type Control struct {
 	shutdown *util.Shutdown
 }
 
-func NewControl(ctlConn conn.Conn, authMsg *msg.Auth) {
+func NewControl(ctlConn conn.Conn, authMsg *msg.Auth, key string) {
 	var err error
 
 	// create the object
@@ -98,6 +99,11 @@ func NewControl(ctlConn conn.Conn, authMsg *msg.Auth) {
 
 	if authMsg.Version != version.Proto {
 		failAuth(fmt.Errorf("Incompatible versions. Server %s, client %s. Download a new version at http://ngrok.com", version.MajorMinor(), authMsg.Version))
+		return
+	}
+
+	if authMsg.User != key {
+		failAuth(errors.New("bad API key"))
 		return
 	}
 
