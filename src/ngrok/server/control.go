@@ -1,16 +1,16 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"io"
+	"runtime/debug"
+	"strings"
+	"time"
+
 	"ngrok/conn"
 	"ngrok/msg"
 	"ngrok/util"
 	"ngrok/version"
-	"runtime/debug"
-	"strings"
-	"time"
 )
 
 const (
@@ -103,7 +103,7 @@ func NewControl(ctlConn conn.Conn, authMsg *msg.Auth, key string) {
 	}
 
 	if authMsg.User != key {
-		failAuth(errors.New("bad API key"))
+		failAuth(fmt.Errorf("bad API key: %s", authMsg.User))
 		return
 	}
 
